@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Kids Quiz</title>
+
+<style>
+body{
+font-family:Arial;
+background:linear-gradient(to right,#00c6ff,#0072ff);
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+#box{
+background:white;
+padding:20px;
+border-radius:15px;
+width:360px;
+text-align:center;
+}
+.btn-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+button{
+padding:10px;
+border:none;
+background:#0984e3;
+color:white;
+border-radius:8px;
+}
+.correct{background:green!important;}
+.wrong{background:red!important;}
+input{padding:10px;width:90%;}
+</style>
+
+</head>
+
+<body>
+
+<div id="box">
+
+<!-- START -->
+<div id="start">
+<h3>Enter Your Name / अपना नाम लिखें</h3>
+<input id="name"><br><br>
+<button onclick="start()">Start Quiz</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" style="display:none;">
+<h3 id="q"></h3>
+<div id="ans" class="btn-grid"></div>
+<p>Score: <span id="score">0</span></p>
+</div>
+
+<!-- RESULT -->
+<div id="result" style="display:none;">
+<h2 id="res"></h2>
+<h3 id="final"></h3>
+
+<button onclick="share()">📲 Share Result</button><br><br>
+<button onclick="restart()">Restart</button>
+</div>
+
+</div>
+
+<script>
+
+// QUESTIONS
+const questions = [
+
+{
+q:"When you meet someone how to greet him?\nजब आप किसी से मिलते हैं तो क्या कहते हैं?",
+a:[
+{text:"Hello (हैलो)",correct:false},
+{text:"Assalamualaikum (अस्सलामुअलैकुम)",correct:true},
+{text:"Assamalaik",correct:false},
+{text:"Walekumassalam (वालेकुम अस्सलाम)",correct:false}
+]
+},
+
+{
+q:"What is the capital of U.P.?\nउत्तर प्रदेश की राजधानी क्या है?",
+a:[
+{text:"Kanpur (कानपुर)",correct:false},
+{text:"Agra (आगरा)",correct:false},
+{text:"Meerut (मेरठ)",correct:false},
+{text:"Lucknow (लखनऊ)",correct:true}
+]
+},
+
+{
+q:"Opposite of short?\nShort का उल्टा क्या है?",
+a:[
+{text:"Big",correct:false},
+{text:"Large",correct:false},
+{text:"Tall (लंबा)",correct:true},
+{text:"Long",correct:false}
+]
+},
+
+{
+q:"5 + 4 = ?",
+a:[
+{text:"1",correct:false},
+{text:"10",correct:false},
+{text:"9",correct:true},
+{text:"8",correct:false}
+]
+},
+
+{
+q:"u + r + d + u = ?",
+a:[
+{text:"Urdu (उर्दू)",correct:true},
+{text:"Hindi",correct:false},
+{text:"Arabic",correct:false},
+{text:"English",correct:false}
+]
+},
+
+{
+q:"Namaz starts with?\nनमाज़ किससे शुरू होती है?",
+a:[
+{text:"Allah Akbar (अल्लाहु अकबर)",correct:true},
+{text:"Subhanallah",correct:false},
+{text:"Bismillah",correct:false},
+{text:"Assalamualaikum",correct:false}
+]
+},
+
+{
+q:"What is your country name?\nआपके देश का नाम क्या है?",
+a:[
+{text:"Hindustan",correct:false},
+{text:"Bharat",correct:false},
+{text:"India",correct:false},
+{text:"All of these (सभी)",correct:true}
+]
+},
+
+{
+q:"Saturday is called?\nशनिवार को क्या कहते हैं?",
+a:[
+{text:"Peer",correct:false},
+{text:"Juma",correct:false},
+{text:"Hafta (हफ्ता)",correct:true},
+{text:"Itwar",correct:false}
+]
+},
+
+{
+q:"1st Prime Minister of India?\nभारत के पहले प्रधानमंत्री?",
+a:[
+{text:"Gandhi",correct:false},
+{text:"Jawaharlal Nehru",correct:true},
+{text:"Ambedkar",correct:false},
+{text:"Azad",correct:false}
+]
+},
+
+{
+q:"We start our meal with?\nहम खाना किससे शुरू करते हैं?",
+a:[
+{text:"Bismillah (बिस्मिल्लाह)",correct:true},
+{text:"Salam",correct:false},
+{text:"Jazakallah",correct:false},
+{text:"Nothing",correct:false}
+]
+}
+
+];
+
+// LOGIC
+let i=0,score=0,name="";
+
+function start(){
+name=document.getElementById("name").value;
+if(!name){alert("Enter name");return;}
+
+document.getElementById("start").style.display="none";
+document.getElementById("quiz").style.display="block";
+
+showQ();
+}
+
+function showQ(){
+let q=questions[i];
+document.getElementById("q").innerText=q.q;
+
+let ans=document.getElementById("ans");
+ans.innerHTML="";
+
+q.a.forEach(opt=>{
+let btn=document.createElement("button");
+btn.innerText=opt.text;
+
+// mark correct
+if(opt.correct) btn.dataset.correct="true";
+
+btn.onclick=()=>{
+let isCorrect = btn.dataset.correct==="true";
+
+// correct click
+if(isCorrect){
+btn.classList.add("correct");
+score++;
+document.getElementById("score").innerText=score;
+}
+// wrong click
+else{
+btn.classList.add("wrong");
+
+// show correct
+Array.from(ans.children).forEach(b=>{
+if(b.dataset.correct==="true"){
+b.classList.add("correct");
+}
+});
+}
+
+// disable all
+Array.from(ans.children).forEach(b=>b.disabled=true);
+
+// next
+setTimeout(()=>{
+i++;
+if(i<questions.length) showQ();
+else showResult();
+},800);
+
+};
+
+ans.appendChild(btn);
+});
+}
+
+function showResult(){
+document.getElementById("quiz").style.display="none";
+document.getElementById("result").style.display="block";
+
+let pass = score>=5;
+
+document.getElementById("res").innerText = pass ? "PASS 🎉 / पास" : "FAIL ❌ / फेल";
+document.getElementById("final").innerText = name+" - Score: "+score+"/10";
+}
+
+function restart(){ location.reload(); }
+
+function share(){
+let text = name+" scored "+score+"/10 in Quiz!";
+let url = "https://wa.me/?text="+encodeURIComponent(text);
+window.open(url,"_blank");
+}
+
+</script>
+
+</body>
+</html>(
